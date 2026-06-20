@@ -8,6 +8,19 @@ This repository hosts public deployment artifacts for `cc-httpserver`.
 docker pull ghcr.io/daodao97/cc_httpserver_deploy/backend:latest
 ```
 
+If pull fails with:
+
+```text
+error from registry: unauthorized
+```
+
+the GHCR package is still private. Either make the package public in GitHub
+Packages, or log in on the server with a token that has `read:packages`:
+
+```bash
+echo '<github-token>' | docker login ghcr.io -u daodao97 --password-stdin
+```
+
 The image is published for both `linux/amd64` and `linux/arm64`, so the same tag
 works on x86 servers and Apple Silicon / ARM servers.
 

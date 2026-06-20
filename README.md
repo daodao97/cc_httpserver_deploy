@@ -26,6 +26,8 @@ SERVER_MASTER_KEY=change-this
 ADMIN_PASSWORD=change-this
 CC_LICENSE=cclic_v1...
 BACKEND_IMAGE=ghcr.io/daodao97/cc_httpserver_deploy/backend:latest
+HTTP_PORT=8080
+MYSQL_DATA_DIR=./data/mysql
 ```
 
 `CC_LICENSE` must be a complete license token issued by the project owner. It
@@ -46,6 +48,15 @@ Start:
 ```bash
 docker compose up -d
 ```
+
+The public endpoint is the nginx `lb` service:
+
+```text
+http://localhost:${HTTP_PORT:-8080}
+```
+
+MySQL data is stored on the host at `MYSQL_DATA_DIR` and defaults to
+`./data/mysql`.
 
 After changing `.env`, recreate the app containers:
 

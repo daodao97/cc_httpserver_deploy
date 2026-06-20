@@ -9,7 +9,7 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-cc_httpserver}
     volumes:
-      - mysql-data:/var/lib/mysql
+      - ${MYSQL_DATA_DIR:-./data/mysql}:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-p${MYSQL_ROOT_PASSWORD:-root}"]
       interval: 5s
@@ -24,6 +24,27 @@ services:
       interval: 5s
       timeout: 3s
       retries: 30
+
+  lb:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      gateway:
+        condition: service_healthy
+    ports:
+      - "${HTTP_PORT:-8080}:80"
+    volumes:
+      - ./deploy/nginx.conf:/etc/nginx/nginx.conf:ro
+    healthcheck:
+      test:
+        - CMD
+        - wget
+        - -qO-
+        - http://127.0.0.1/healthz
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
 
   gateway:
     image: ${BACKEND_IMAGE:-ghcr.io/daodao97/cc_httpserver_deploy/backend:latest}
@@ -47,8 +68,8 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-    ports:
-      - "${HTTP_PORT:-8080}:3000"
+    expose:
+      - "3000"
     healthcheck:
       test:
         - CMD
@@ -90,6 +111,3 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
-
-volumes:
-  mysql-data:

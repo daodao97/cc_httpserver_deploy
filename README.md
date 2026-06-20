@@ -46,7 +46,8 @@ cc-httpserver worker license check failed: invalid license token format
 Start:
 
 ```bash
-docker compose up -d
+chmod +x deploy.sh
+./deploy.sh deploy 3
 ```
 
 The public endpoint is the nginx `lb` service:
@@ -58,10 +59,22 @@ http://localhost:${HTTP_PORT:-8080}
 MySQL data is stored on the host at `MYSQL_DATA_DIR` and defaults to
 `./data/mysql`.
 
+Scale gateway replicas:
+
+```bash
+./deploy.sh scale 5
+```
+
+Refresh nginx upstreams after manual gateway changes:
+
+```bash
+./deploy.sh restart-lb
+```
+
 After changing `.env`, recreate the app containers:
 
 ```bash
-docker compose up -d --force-recreate
+./deploy.sh deploy 3
 ```
 
 ## Issue a License
